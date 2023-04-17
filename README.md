@@ -1,1 +1,1 @@
-# m1paper
+# Econometrics/Quantitative Paper

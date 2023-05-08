@@ -10,3 +10,5 @@ In this repository, you will find:
   - final_merge.dta is the dataset before I add the 1997 and 2002 electoral results. 
   - extend_merge.dta is the same dataset but with these results added. 
   - instrument_merge.dta is the same dataset, but with the instruments too. 
+
+Ultimately, all my results should be fully replicable. 

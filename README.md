@@ -11,4 +11,4 @@ In this repository, you will find:
   - extend_merge.dta is the same dataset but with these results added. 
   - instrument_merge.dta is the same dataset, but with the instruments too. 
 
-I cannot promise that the code is the cleanest, but ultimately, all of it should run and all my results should be fully replicable. 
+I cannot promise that the code is the cleanest, but ultimately, all of it should run and all my results should fully replicate. 

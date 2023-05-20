@@ -60,7 +60,7 @@ foreach var of varlist `r(varlist)' {
 *** 2. MODEL SPECIFICATION *************************************************
 ****************************************************************************/
 	
-	/// Hsiao specification test
+	/// Hsiao poolability test & multicollinearity
 
 * Step 1
 reg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept 
@@ -68,28 +68,34 @@ reg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_pro
 scalar pooled_RSS = e(rss)
 scalar pooled_rdof = e(N) - e(df_m)
 
-*scalar heterogeneous_RSS = 0
-*scalar heterogeneous_rdof = 0
+scalar heterogeneous_RSS = 0
+scalar heterogeneous_rdof = 0
+
+* Not to run – takes a decade and gives 'r(2000) no observations' for reasons detailed in the paper. 
 
 *forvalues i = 1/`=_N' {
-*    quietly reg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept if depcom == `i'
+*	quietly reg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth *crime_dept_prop logements_dept_prop schools pop_commune pop_dept if depcom == `i'
 *    scalar heterogeneous_RSS = heterogeneous_RSS + e(rss)
 *    scalar unit_rdof = e(N) - e(df_m)
 *    scalar heterogeneous_rdof = heterogeneous_rdof + unit_rdof
 *}
 
-	* Estimate separate OLS models for each cross-sectional unit and store RSS and r_dof
+* Estimate separate OLS models for each cross-sectional unit and store RSS and r_dof. 
+* Should not be run either ; is the same operation as above but presents the issue of multicollinearity more clearly.
+
 *bysort depcom: reg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept
 *bysort depcom: egen unit_rss = total(e(rss))
 *bysort depcom: egen unit_rdof = total(e(N) - e(df_m))
 
-	* Calculate combined RSS and r_dof for all separate OLS models
+* Calculate combined RSS and r_dof for all separate OLS models
+
 *egen heterogeneous_RSS = total(unit_rss), by(depcom)
 *egen heterogeneous_rdof = total(unit_rdof), by(depcom)
 
 *scalar f_stat = ((heterogeneous_RSS - pooled_RSS) / (heterogeneous_rdof - pooled_rdof)) / (pooled_RSS / pooled_rdof)
 
-* step 2
+* VIF
+vif
 
 * step 3
 xtreg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept, fe
@@ -97,12 +103,14 @@ xtreg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_p
 ***********************************************************************************************************************************************************************************************
 	/// Stationarity
 	
-*local variables "immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept"
+tset depcom year, delta(5)
+	
+local variables "immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept"
 
-*foreach var of local variables {
-    *display "Performing ADF test for `var'"
-    *dfuller `var', lags(1)
-*}
+xtunitroot fisher immi_prop, dfuller lags(1)
+xtunitroot llc immi_prop, lags(1)
+
+*If it had run, I would have created a for loop to test all variables, but obviously, the small T problem applies equally to all of them.
 
 ***********************************************************************************************************************************************************************************************
 	/// Robust Hausman test 
@@ -294,7 +302,7 @@ esttab static1 dynamic1 dynamic2 dynamic3 ///
 	order(extdr_leg lag_extdrleg1 lag_extdrleg2 cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop schools avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop pop_commune pop_dept 2012.year 2017.year) /// 
 	collabels(none) ///
 	legend /// 
-	addnote("Unit and temporal fixed effects models" /// 
+	addnote("Unit and temporal fixed effects models." /// 
 			"Cluster-robust standard errors in parentheses." ///
 			"(d) for variables aggregated at the département level.")
 
@@ -316,7 +324,7 @@ esttab static1 dynamic1 dynamic2 dynamic3 ///
 	order(extdr_leg lag_extdrleg1 lag_extdrleg2 cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop schools avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop pop_commune pop_dept 2012.year 2017.year) /// 
 	collabels(none) ///
 	legend /// 
-	addnote("Unit and temporal fixed effects models" /// 
+	addnote("Unit and temporal fixed effects models." /// 
 			"Cluster-robust standard errors in parentheses." ///
 			"(d) for variables aggregated at the département level.")
 	***********************************************************************************************************************************************************************************************
@@ -593,7 +601,7 @@ using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences
 			"(d) for variables aggregated at the département level.")
 			
 ***********************************************************************************************************************************************************************************************
-			/// IV Diagnostics
+			/// IV Diagnostics (not in the right order, sorry!)
 			
 quietly ivreg2 immi_prop (extdr_leg = fn86_yd4 fn86_yd5) lag_extdrleg1 lag_extdrleg2 cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept yd4 yd5 if yd3 == 1 | yd4 == 1 | yd5 == 1, partial(yd4 yd5) cluster(depcom) first savefirst savefprefix(st1)
 

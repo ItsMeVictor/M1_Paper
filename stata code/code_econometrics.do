@@ -13,7 +13,7 @@ eststo clear
 *capture ssc install estout
 
 	/// Path & data 
-use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/data/final_data/final_merge.dta"
+use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/data/final_data/final_merge.dta"
 
 	/// Set data as panel data 
 encode code_insee, generate(depcom)
@@ -102,19 +102,18 @@ xtreg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_p
 
 ***********************************************************************************************************************************************************************************************
 	/// Stationarity
-	
-tset depcom year, delta(5)
-	
-local variables "immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept"
-
-xtunitroot fisher immi_prop, dfuller lags(1)
-xtunitroot llc immi_prop, lags(1)
-
 *If it had run, I would have created a for loop to test all variables, but obviously, the small T problem applies equally to all of them.
+	
+*tset depcom year, delta(5)
+	
+*local variables "immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept"
+
+*xtunitroot fisher immi_prop, dfuller lags(1)
+*xtunitroot llc immi_prop, lags(1)
 
 ***********************************************************************************************************************************************************************************************
 	/// Robust Hausman test 
-
+	
 * Fixed effects estimation
 xtreg immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop schools pop_commune pop_dept, fe
 
@@ -168,7 +167,7 @@ xtserial immi_prop extdr_leg cadres_prop dropouts_prop employes_prop agriculteur
 * Extend dataset for additional time-periods - Setup
 drop _all
 
-use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/data/final_data/extend_merge.dta"
+use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/data/final_data/extend_merge.dta"
 
 encode code_insee, generate(depcom)
 sort depcom year
@@ -240,7 +239,7 @@ eststo dynamic3
 
 *1
 esttab static1 dynamic1 dynamic2 dynamic3 ///
-	using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/static_dynamic.tex", replace ///
+	using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/static_dynamic.tex", replace ///
 	label ///
 	nonotes ///
 	se(3) ///
@@ -259,56 +258,11 @@ esttab static1 dynamic1 dynamic2 dynamic3 ///
 	addnote("Population variables dropped from the table. See table \ref{tab:staticextended} for extended version." /// 
 			"Cluster-robust standard errors in parentheses." ///
 			"(d) for variables aggregated at the département level.") 
-
-*2
-esttab static1 dynamic1 dynamic2 dynamic3 ///
-	using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/static_dynamic.tex", replace ///
-	label ///
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(r2_a N, labels("Adj. R-squared" "Number of observations")) ///
-	title("Regression results – Static and dynamic modeling \label{tab:static}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("Static" "Dynamic (1st)" "Dynamic (2nd)" "Dynamic (full)" ) ///
-	drop(2007.year _cons pop_commune pop_dept) ///
-	order(extdr_leg lag_extdrleg1 lag_extdrleg2 cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop schools avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop pop_commune pop_dept 2012.year 2017.year) /// 
-	collabels(none) ///
-	legend /// 
-	addnote("Population variables dropped from the table. See table \ref{tab:staticextended} for extended version." /// 
-			"Cluster-robust standard errors in parentheses." ///
-			"(d) for variables aggregated at the département level.") 
-
 
 * Extended table (for appendix)	
 *1
 esttab static1 dynamic1 dynamic2 dynamic3 ///
-	using  "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/long_static_dynamic.tex", replace ///
-	label ///
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(r2_a F N, labels("Adj. R-squared" "F-statistic" "Number of observations")) ///
-	title("Regression results – Static and dynamic modeling (extended) \label{tab:staticextended}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("Static" "Dynamic (1st)" "Dynamic (2nd)" "Dynamic (full)" ) ///
-	longtable /// 
-	order(extdr_leg lag_extdrleg1 lag_extdrleg2 cadres_prop dropouts_prop employes_prop agriculteurs_prop retraites_prop hlm_prop chomeurs_prop ouvriers_prop schools avg5_naissances_dept avg5_popdept_growth crime_dept_prop logements_dept_prop pop_commune pop_dept 2012.year 2017.year) /// 
-	collabels(none) ///
-	legend /// 
-	addnote("Unit and temporal fixed effects models." /// 
-			"Cluster-robust standard errors in parentheses." ///
-			"(d) for variables aggregated at the département level.")
-
-*2
-esttab static1 dynamic1 dynamic2 dynamic3 ///
-	using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/long_static_dynamic.tex", replace ///
+	using  "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/long_static_dynamic.tex", replace ///
 	label ///
 	nonotes ///
 	se(3) ///
@@ -330,11 +284,11 @@ esttab static1 dynamic1 dynamic2 dynamic3 ///
 	***********************************************************************************************************************************************************************************************
 		/// Instrumental variable estimation 
 
-* Loading the data that includes our instruments – Setup 
+* Loading the data that includes our instruments – Setup *
 
 drop _all
 
-use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/data/final_data/instrument_merge.dta"
+use "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/data/final_data/instrument_merge.dta"
 
 encode code_insee, generate(depcom)
 sort depcom year
@@ -377,7 +331,7 @@ label variable extdr1986 "1986 Far-right electoral results"
 label variable lag_extdrleg1 "1st order lagged far-right votes"
 label variable lag_extdrleg2 "2nd order lagged far-right votes"
 
-* Drop all variables that do not have a label (for simplicity, given how extensive the dataset is) **
+* Drop all variables that do not have a label (for simplicity, given how extensive the dataset is) *
 ds
 foreach var of varlist `r(varlist)' {
     if "`: variable label `var''" == "" {
@@ -411,7 +365,7 @@ use mydata_transformed.dta
 
 * IMPORTANT: Here, I apply the time-demeaned manipulation so I can then estimate my model using ivreg2, which does not accept fixed effects. 
 * Xtivreg2 does, but cannot be followed by the robust weak instrument test weakivtest, so I apply the time-demeaning manipulation before estimating the model. 
-* Naturally, there are no differences between the two approaches. 
+* Naturally, there are no differences between the two approaches, as the results of the xtivreg2 above and the ivreg2 below demonstrate. 
 xtset depcom year, delta(5)
 xtdata, fe
 
@@ -423,7 +377,7 @@ estadd scalar R_st1 = `e(r2)': st1extdr_leg
 * First stage table
 *1
 esttab st* /// 
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/stage1_instr1.tex", replace ///
+using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/stage1_instr1.tex", replace ///
 	label /// 
 	nonotes ///
 	se(3) ///
@@ -443,53 +397,10 @@ using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences
 	"(d) for variables aggregated at the département level." ///
 	"Population and time-dummies dropped from the table. See table \ref{tab:stage1extended} for extended version.")
 	
-*2
-esttab st* ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/stage1_instr1.tex", replace ///
-	label /// 
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(F_st1 R_st1 N, labels("F-statistic" "R-squared" "Number of observations")) ///
-	title("2SLS First-stage estimation results \label{tab:stage1}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("\% Far-right votes") ///
-	drop(pop_commune pop_dept) ///
-	collabels(none) ///
-	legend /// 
-	addnote("Cluster-robust standard errors in parentheses." ///
-	"Unit and temporal fixed effects." /// 
-	"(d) for variables aggregated at the département level." ///
-	"Population and time-dummies dropped from the table. See table \ref{tab:stage1extended} for extended version.")
-
 * First stage - Extended table (for appendix)
 *1
 esttab st* ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/stage1_instr1_long.tex", replace ///
-	label /// 
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(F_st1 R_st1 N, labels("F-statistic" "R-squared" "Number of observations")) ///
-	title("2SLS First-stage estimation results (extended) \label{tab:stage1extended}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("\% Far-right votes") ///
-	collabels(none) ///
-	legend /// 
-	longtable /// 
-	addnote("Cluster-robust standard errors in parentheses." ///
-			"Unit and temporal fixed effects." ///
-			"(d) for variables aggregated at the département level.")
-
-*2
-esttab st* ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/stage1_instr1_long.tex", replace ///
+using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/stage1_instr1_long.tex", replace ///
 	label /// 
 	nonotes ///
 	se(3) ///
@@ -515,7 +426,7 @@ estadd scalar ar2 = `e(r2_a)'
 
 *1
 esttab /// 
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/iv_estimation.tex", replace ///
+using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/iv_estimation.tex", replace ///
 	label /// 
 	nonotes ///
 	se(3) ///
@@ -534,54 +445,11 @@ using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences
 	"Unit and temporal fixed effects." /// 
 	"(d) for variables aggregated at the département level." ///
 	"Population and time-dummies dropped from the table. See table \ref{tab:ivextended} for extended version.")
-	
-*2
-esttab ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/iv_estimation.tex", replace ///
-	label /// 
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(F_iv ar2 N n_clust, labels("F-statistic" "Adjusted R-squared" "Number of observations" "Number of clusters")) ///
-	title("Regression results – Instrumental variable estimation \label{tab:iv}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("\% Immigrants") ///
-	drop(pop_commune pop_dept) ///
-	collabels(none) ///
-	legend /// 
-	addnote("Cluster-robust standard errors in parentheses." ///
-	"Unit and temporal fixed effects." /// 
-	"(d) for variables aggregated at the département level." ///
-	"Population and time-dummies dropped from the table. See table \ref{tab:ivextended} for extended version.")
-
 
 * 2SLS Results – Extended table (for appendix)
 *1
 esttab ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself_new/iv_estimationlong.tex", replace ///
-	label /// 
-	nonotes ///
-	se(3) ///
-	star(* 0.10 ** 0.05 *** 0.01) ///
-	stats(F_iv ar2 N n_clust, labels("F-statistic" "Adjusted R-squared" "Number of observations" "Number of clusters")) ///
-	title("Regression results – Instrumental variable estimation (extended) \label{tab:ivextended}") ///
-	nonumbers ///
-	booktabs ///
-	nomtitles ///
-	noobs ///
-	mlabels("\% Immigrants") ///
-	collabels(none) ///
-	legend /// 
-	longtable /// 
-	addnote("Cluster-robust standard errors in parentheses." ///
-			"Unit and temporal fixed effects." ///
-			"(d) for variables aggregated at the département level.")
-			
-esttab ///
-using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/quantitative_methods_2/rovny_paperitself/iv_estimationlong.tex", replace ///
+using "/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/m1_paper/paper_itself/iv_estimationlong.tex", replace ///
 	label /// 
 	nonotes ///
 	se(3) ///

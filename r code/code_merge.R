@@ -119,7 +119,9 @@ merged2017 <- leg2017 %>%
   select(-ends_with(".x"), -ends_with(".y"))
 
 ###################################################################################################################################
-
+#this merges everything together
+#but it will take a long time to run because of the second last command 
+#that uses the INSEE api
 final_merge = bind_rows(merged2007, merged2012, merged2017) %>%
   ungroup() %>%
   # rename("depcom" = "depcom.x") %>%

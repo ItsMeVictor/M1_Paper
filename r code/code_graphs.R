@@ -1,7 +1,9 @@
 library(pacman)
-p_load(haven, data.table, purrr, readxl, rgeoapi, tidyverse, sf, mapsf, viridis)
+p_load(haven, data.table, purrr, readxl, rgeoapi, tidyverse, sf, mapsf, viridis, patchwork)
 
-setwd("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4. sciences po/work/semestre 2/serranito - advanced econometrics/serranito - paper/data/")
+setwd("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper")
+
+# setwd("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4. sciences po/work/semestre 2/serranito - advanced econometrics/serranito - paper/data/")
 
 communes_shp <- st_read("commune_shapefile/communes-20220101-shp/communes-20220101.shp") %>%
   rename("code_insee" = "insee") %>%
@@ -19,7 +21,7 @@ immi2017 = final_merge %>%
   st_as_sf %>% 
   st_transform(., crs = 2154)
 
-pdf("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4. sciences po/work/semestre 2/serranito - advanced econometrics/serranito - paper/paper itself/immigrants2017.pdf", 
+pdf("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself/immigrants2017.pdf", 
     width = 8, 
     height = 12, 
     compress = TRUE)
@@ -54,7 +56,7 @@ extdr2017 = leg2017 %>%
   st_as_sf %>% 
   st_transform(., crs = 2154)
 
-pdf("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4. sciences po/work/semestre 2/serranito - advanced econometrics/serranito - paper/paper itself/extdrvote2017.pdf", 
+pdf("/Users/victorkreitmann/Desktop/synced/life/academia-pro/school/4.sciences_po/work/semestre_2/serranito_advancedeconometrics/serranito_paper/serranito_paperitself/extdrvote2017.pdf", 
     width = 8, 
     height = 12, 
     compress = TRUE)
@@ -78,3 +80,51 @@ mf_map(extdr2017,
 dev.off()
 
 ###########################################################################################################
+# far-right voting histograms
+plot_vote <- function(data, time){
+  plot <- data %>%
+    filter(year == time) %>%
+    ggplot(aes(x = extdr_leg)) +
+    geom_histogram(bins = 100, fill = 'dodgerblue2', color = "grey", size = 0.01) +
+    theme_minimal() +
+    labs(x = "",
+         y = "Frequency") +
+    theme(axis.text = element_text(size = 20),
+          axis.title = element_text(size = 20))
+
+  return(plot)
+}
+
+vote2007 <- plot_vote(final_merge, "2007")
+vote2012 <- plot_vote(final_merge, "2012")
+vote2017 <- plot_vote(final_merge, "2017")
+
+ggsave("vote2007.pdf", vote2007, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")
+ggsave("vote2012.pdf", vote2012, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")
+ggsave("vote2017.pdf", vote2017, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")
+
+
+###########################################################################################################
+#proportion of immigrants histograms
+
+plot_immi <- function(data, time){
+  plot <- data %>%
+    filter(year == time) %>%
+    ggplot(aes(x = immi_prop)) +
+    geom_histogram(bins = 80, fill = 'salmon2', color = "grey", size = 0.01) +
+    theme_minimal() +
+    labs(x = "",
+         y = "Frequency") +
+    theme(axis.text = element_text(size = 20),
+          axis.title = element_text(size = 20))
+  
+  return(plot)
+}
+
+immi2007 <- plot_immi(final_merge, "2007")
+immi2012 <- plot_immi(final_merge, "2012")
+immi2017 <- plot_immi(final_merge, "2017")
+
+ggsave("immi2007.pdf", immi2007, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")
+ggsave("immi2012.pdf", immi2012, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")
+ggsave("immi2017.pdf", immi2017, device = "pdf", dpi = 500, units = "cm", path = "serranito_paperitself_new/")

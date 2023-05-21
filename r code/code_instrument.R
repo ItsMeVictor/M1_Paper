@@ -248,7 +248,7 @@ instrument_extend_merge = extend_merge %>%
   relocate(code_insee, .after = cantville) %>% 
   ungroup()
 
-instrument_extend_merge %>% 
-  select(-geometry) %>% 
-  write_dta("final_data/instrument_merge.dta")
-  
+# instrument_extend_merge %>% 
+#   select(-geometry) %>% 
+#   write_dta("final_data/instrument_merge.dta")
+#
